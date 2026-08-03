@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  honeypot:
+    build: ./ai-deception-capstone/deception_layer/honeypot
+    container_name: cowrie_honeypot
+    ports:
+      - "2222:2222"
+    volumes:
+      - ./ai-deception-capstone/deception_layer/honeypot:/cowrie
+
+  ml_engine:
+    image: python:3.11-slim
+    container_name: ml_engine
+    working_dir: /app
+    volumes:
+      - ./ai-deception-capstone/ml_engine:/app
+    command: tail -f /dev/null
+
+  dashboard:
+    image: node:18-slim
+    container_name: dashboard
+    working_dir: /app
+    volumes:
+      - ./ai-deception-capstone/dashboard:/app
+    command: tail -f /dev/null
