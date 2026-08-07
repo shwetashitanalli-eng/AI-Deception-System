@@ -1,0 +1,3 @@
+{"ip": "192.168.1.5", "command_count": 45, "session_duration_seconds": 120, "failed_login_attempts": 1, "canary_triggered": false}
+{"ip": "45.33.22.1", "command_count": 1, "session_duration_seconds": 5, "failed_login_attempts": 5000, "canary_triggered": false}
+{"ip": "185.44.3.2", "command_count": 30, "session_duration_seconds": 95, "failed_login_attempts": 2, "canary_triggered": true}

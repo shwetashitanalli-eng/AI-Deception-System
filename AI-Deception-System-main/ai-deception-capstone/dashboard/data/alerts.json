@@ -1,0 +1,16 @@
+[
+  {
+    "source_ip": "192.168.1.5",
+    "command_count": 45,
+    "session_duration_seconds": 120,
+    "failed_login_attempts": 1,
+    "ai_threat_score": 85
+  },
+  {
+    "source_ip": "185.44.3.2",
+    "command_count": 30,
+    "session_duration_seconds": 95,
+    "failed_login_attempts": 2,
+    "ai_threat_score": 78
+  }
+]
