@@ -1,26 +1,41 @@
 version: '3.8'
 
 services:
+  # 1. Cowrie SSH Honeypot (Deception Layer)
   honeypot:
-    build: ./ai-deception-capstone/deception_layer/honeypot
+    build:
+      context: ./deception_layer/honeypot
+      dockerfile: Dockerfile
     container_name: cowrie_honeypot
     ports:
-      - "2222:2222"
+      - "2222:2222" # SSH Trapping Port
     volumes:
-      - ./ai-deception-capstone/deception_layer/honeypot:/cowrie
+      - ./ml_engine/data:/cowrie/var/log/cowrie
+    restart: always
 
+  # 2. ML Threat Model Engine
   ml_engine:
-    image: python:3.11-slim
-    container_name: ml_engine
-    working_dir: /app
+    build:
+      context: ./ml_engine
+    container_name: ai_threat_engine
     volumes:
-      - ./ai-deception-capstone/ml_engine:/app
-    command: tail -f /dev/null
+      - ./ml_engine/data:/app/data
+      - ./ml_engine/models:/app/models
+    command: python threat_model.py
+    depends_on:
+      - honeypot
 
-  dashboard:
-    image: node:18-slim
-    container_name: dashboard
-    working_dir: /app
+  # 3. SOC Dashboard UI
+  soc_dashboard:
+    build:
+      context: ./dashboard
+    container_name: soc_dashboard
+    ports:
+      - "3000:3000"
     volumes:
-      - ./ai-deception-capstone/dashboard:/app
-    command: tail -f /dev/null
+      - ./ml_engine/data:/app/ml_engine/data
+    environment:
+      - PORT=3000
+    depends_on:
+      - ml_engine
+    restart: always
