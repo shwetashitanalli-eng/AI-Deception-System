@@ -1,73 +1,65 @@
-# ml_engine/threat_model.py
-
+import json
 import os
 import pandas as pd
-import numpy as np
-import joblib
 from sklearn.ensemble import IsolationForest
 
-# Define default paths relative to this file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_DATA_PATH = os.path.join(BASE_DIR, "data", "honeypot_logs.csv")
-DEFAULT_MODEL_PATH = os.path.join(BASE_DIR, "models", "isolation_forest.joblib")
+def parse_cowrie_logs(log_path):
+    """Parses raw Cowrie JSON logs into structured feature metrics."""
+    if not os.path.exists(log_path):
+        print(f"Log file not found: {log_path}")
+        return pd.DataFrame()
 
+    with open(log_path, 'r') as f:
+        logs = json.load(f)
 
-def train_threat_model(data_path=DEFAULT_DATA_PATH, save_model_path=DEFAULT_MODEL_PATH):
-    """
-    Loads honeypot logs, trains an Isolation Forest model, 
-    and saves the model binary for live inference.
-    """
-    print(f"[*] Loading Honeypot log dataset from: {data_path}")
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(
-            f"Dataset not found at '{data_path}'. Please run 'generate_data.py' first!"
-        )
+    sessions = {}
+    for entry in logs:
+        session_id = entry.get("session")
+        event_id = entry.get("eventid")
+        if not session_id:
+            continue
 
-    df = pd.read_csv(data_path)
+        if session_id not in sessions:
+            sessions[session_id] = {
+                "session_id": session_id,
+                "failed_logins": 0,
+                "command_count": 0,
+                "file_uploads": 0
+            }
 
-    # Features selected for anomaly profiling
-    features = ['failed_login_attempts', 'session_duration_seconds', 'command_count']
+        if event_id == "cowrie.login.failed":
+            sessions[session_id]["failed_logins"] += 1
+        elif event_id == "cowrie.command.input":
+            sessions[session_id]["command_count"] += 1
+        elif event_id == "cowrie.session.file_upload":
+            sessions[session_id]["file_uploads"] += 1
+
+    return pd.DataFrame(list(sessions.values()))
+
+def calculate_threat_scores(df):
+    """Trains Isolation Forest and assigns threat scores to sessions."""
+    features = ["failed_logins", "command_count", "file_uploads"]
     X = df[features]
 
-    # Contamination=0.05 assumes roughly 5% of incoming connections are high-severity targeted attacks
-    print("[*] Training Isolation Forest Model...")
-    model = IsolationForest(n_estimators=100, contamination=0.05, random_state=42)
+    # Initialize Isolation Forest model
+    model = IsolationForest(contamination=0.2, random_state=42)
     model.fit(X)
 
-    # Predict: -1 indicates anomaly (targeted threat), 1 indicates normal (bot noise)
-    df['anomaly_label'] = model.predict(X)
-
-    # Calculate normalized AI Threat Score (0 to 100)
+    # Anomaly flag (-1 = Anomaly, 1 = Normal)
+    df["anomaly_flag"] = model.predict(X)
+    
+    # Raw decision function converted to a 0-1 Threat Score (Higher = Riskier)
     scores = model.decision_function(X)
-    df['ai_threat_score'] = ((0.5 - scores) * 100).clip(0, 100).astype(int)
-
-    # Save trained model artifact
-    os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-    joblib.dump(model, save_model_path)
-    print(f"[+] Model artifact saved to: {save_model_path}")
-
-    # Summary
-    critical_threats = df[df['anomaly_label'] == -1]
-    print(f"[!] Total logs analyzed: {len(df)}")
-    print(f"[!] Critical anomalous sessions flagged: {len(critical_threats)}")
+    df["threat_score"] = (scores.max() - scores) / (scores.max() - scores.min() + 1e-6)
 
     return df
 
-
-def score_live_session(features_df, model_path=DEFAULT_MODEL_PATH):
-    """
-    Evaluates new real-time honeypot sessions using the saved model.
-    """
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model file missing at '{model_path}'. Train model first.")
-
-    model = joblib.load(model_path)
-    predictions = model.predict(features_df)
-    scores = model.decision_function(features_df)
-    threat_scores = ((0.5 - scores) * 100).clip(0, 100).astype(int)
-
-    return predictions, threat_scores
-
-
 if __name__ == "__main__":
-    train_threat_model()
+    # Example path relative to ml_engine folder
+    sample_log_path = os.path.join("data", "cowrie_sample.json")
+    
+    df_features = parse_cowrie_logs(sample_log_path)
+    if not df_features.empty:
+        results = calculate_threat_scores(df_features)
+        print("--- Machine Learning Threat Assessment ---")
+        print(results[["session_id", "failed_logins", "command_count", "file_uploads", "threat_score", "anomaly_flag"]])
