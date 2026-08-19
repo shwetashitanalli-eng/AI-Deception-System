@@ -1,26 +1,27 @@
 version: '3.8'
 
 services:
-  honeypot:
-    build: ./ai-deception-capstone/deception_layer/honeypot
+  backend:
+    build: ./ml_engine
+    container_name: ai_deception_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./ai_deception.db
+    restart: always
+
+  frontend:
+    build: ./dashboard
+    container_name: ai_deception_frontend
+    ports:
+      - "3000:80"   # Maps your browser's port 3000 to Nginx's port 80
+    depends_on:
+      - backend
+    restart: always
+
+  cowrie:
+    image: cowrie/cowrie:latest
     container_name: cowrie_honeypot
     ports:
       - "2222:2222"
-    volumes:
-      - ./ai-deception-capstone/deception_layer/honeypot:/cowrie
-
-  ml_engine:
-    image: python:3.11-slim
-    container_name: ml_engine
-    working_dir: /app
-    volumes:
-      - ./ai-deception-capstone/ml_engine:/app
-    command: tail -f /dev/null
-
-  dashboard:
-    image: node:18-slim
-    container_name: dashboard
-    working_dir: /app
-    volumes:
-      - ./ai-deception-capstone/dashboard:/app
-    command: tail -f /dev/null
+    restart: always

@@ -1,0 +1,16 @@
+﻿=== START ===
+=== DOCKER DESKTOP STATUS ===
+
+=== DOCKER CONTEXTS ===
+
+=== DOCKER INFO DEFAULT ===
+
+=== DOCKER INFO DESKTOP-LINUX ===
+
+=== NETSTAT 3000 ===
+
+=== LISTENER PROCESS ===
+
+
+=== HTTP REQUEST ===
+

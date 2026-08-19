@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI Deception Dashboard</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #edf2f7;
+        background: #0f172a;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, rgba(59,130,246,.2), transparent 35%), linear-gradient(180deg, #111827 0%, #0f172a 100%); }
+      .page { max-width: 1280px; margin: 0 auto; padding: 24px; }
+      .header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 24px; }
+      .header-left { min-width: 220px; }
+      .title { font-size: clamp(2rem, 2.5vw, 2.8rem); margin: 0; color: #7dd3fc; }
+      .subtitle { color: #cbd5e1; margin: 8px 0 0; }
+      .badge { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: rgba(14, 165, 233, .1); border: 1px solid rgba(56, 189, 248, .18); color: #bae6fd; font-weight: 600; }
+      .cards-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 24px; }
+      .metric-card { background: rgba(15, 23, 42, .92); border: 1px solid rgba(148, 163, 184, .1); border-radius: 24px; padding: 22px; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
+      .metric-card h3 { margin: 0 0 14px; font-size: .88rem; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+      .metric-value { font-size: clamp(2rem, 3vw, 3.2rem); font-weight: 700; line-height: 1; }
+      .metric-note { color: #cbd5e1; margin-top: 8px; font-size: 0.96rem; }
+      .section { background: rgba(15, 23, 42, .95); border: 1px solid rgba(148, 163, 184, .1); border-radius: 24px; padding: 24px; margin-bottom: 24px; }
+      .section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 12px; }
+      .section-title h2 { font-size: 1.1rem; margin: 0; color: #e2e8f0; }
+      .section-caption { color: #94a3b8; font-size: .96rem; }
+      .chart-grid { display: grid; gap: 20px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .chart-panel { background: rgba(15, 23, 42, .98); border: 1px solid rgba(148, 163, 184, .1); border-radius: 24px; padding: 20px; min-height: 320px; display: flex; flex-direction: column; }
+      .chart-title { color: #cbd5e1; font-size: .98rem; margin-bottom: 16px; font-weight: 600; }
+      .chart-area, .chart-bars, .chart-pie { flex: 1; display: grid; place-items: center; }
+      .line-chart { width: 100%; height: 180px; display: grid; align-items: end; gap: 8px; }
+      .line-column { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
+      .line-dot { width: 100%; border-radius: 999px; background: #22d3ee; }
+      .bar-series { width: 100%; display: flex; align-items: flex-end; gap: 10px; height: 180px; }
+      .bar { flex: 1; border-radius: 12px 12px 0 0; background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%); min-height: 16px; }
+      .bar-label { margin-top: 10px; font-size: .82rem; color: #94a3b8; text-align: center; }
+      .pie-legend { display: grid; gap: 12px; width: 100%; }
+      .legend-item { display: flex; align-items: center; gap: 10px; font-size: .94rem; color: #cbd5e1; }
+      .legend-color { width: 12px; height: 12px; border-radius: 999px; }
+      .donut { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#10b981 0deg 120deg, #f59e0b 120deg 180deg, #ef4444 180deg 240deg, #64748b 240deg 360deg); margin: 0 auto 16px; position: relative; }
+      .donut::before { content: ''; position: absolute; inset: 20px; background: #0f172a; border-radius: 50%; }
+      .threat-list { display: grid; gap: 16px; }
+      .alert-card, .canary-card { display: grid; gap: 12px; background: rgba(15, 23, 42, .98); border: 1px solid rgba(148, 163, 184, .12); border-radius: 20px; padding: 18px; }
+      .alert-card h3, .canary-card h3 { margin: 0; font-size: 1rem; color: #7dd3fc; }
+      .alert-meta, .canary-meta { display: grid; gap: 6px; color: #cbd5e1; font-size: .94rem; }
+      .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(59, 130, 246, .12); color: #7dd3fc; font-weight: 600; }
+      .resource-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+      .resource-item { padding: 14px 16px; border-radius: 14px; background: rgba(15, 23, 42, .9); border: 1px solid rgba(148, 163, 184, .1); color: #cbd5e1; text-decoration: none; transition: transform .2s ease, background .2s ease; }
+      .resource-item:hover { transform: translateY(-2px); background: rgba(56, 189, 248, .12); }
+      @media (max-width: 960px) { .chart-grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="header-left">
+          <p class="title">AI Deception System</p>
+          <p class="subtitle">Live SOC dashboard powered by the ML-managed threat feed</p>
+        </div>
+        <div class="badge" id="last-updated">Updated now</div>
+      </div>
+
+      <div class="cards-grid" id="summary-cards"></div>
+
+      <div class="section" id="headline-section">
+        <div class="section-title">
+          <h2>Overview</h2>
+          <span class="section-caption" id="overview-caption"></span>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-panel">
+            <div class="chart-title">Activity Over Time</div>
+            <div class="line-chart" id="activity-chart"></div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-title">AI Threat Score Distribution</div>
+            <div class="chart-bars" id="score-chart"></div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-title">Severity Distribution</div>
+            <div class="chart-pie">
+              <div class="donut"></div>
+              <div class="pie-legend" id="severity-legend"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="threat-feed-section">
+        <div class="section-title">
+          <h2>Threat Feed (AI-Ranked by Score)</h2>
+          <span class="section-caption">Real alerts and live detections from the current dataset.</span>
+        </div>
+        <div class="threat-list" id="threat-feed"></div>
+      </div>
+
+      <div class="section" id="canary-section">
+        <div class="section-title">
+          <h2>Canary / Deception Events</h2>
+          <span class="section-caption">Decoy interactions and simulated deception alerts.</span>
+        </div>
+        <div class="threat-list" id="canary-events"></div>
+        <div class="resource-list">
+          <a href="#" class="resource-item">/decoy/admin-passwords.txt</a>
+          <a href="#" class="resource-item">/decoy/confidential-notes.txt</a>
+          <a href="#" class="resource-item">/decoy/backup-archive.txt</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

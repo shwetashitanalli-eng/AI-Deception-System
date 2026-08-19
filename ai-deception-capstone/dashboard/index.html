@@ -1,0 +1,2207 @@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Deception System | SOC Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #07111f;
+            color: #e8eef7;
+        }
+
+        /* ================= LOGIN ================= */
+
+        #loginPage {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background:
+                radial-gradient(circle at top left, #123c6b, transparent 35%),
+                radial-gradient(circle at bottom right, #27104d, transparent 35%),
+                #050c16;
+        }
+
+        .login-box {
+            width: 400px;
+            padding: 35px;
+            background: rgba(10, 23, 40, 0.95);
+            border: 1px solid #1e4168;
+            border-radius: 18px;
+            box-shadow: 0 0 40px rgba(0, 123, 255, 0.15);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo .shield {
+            font-size: 55px;
+        }
+
+        .login-logo h1 {
+            color: #48a9ff;
+            font-size: 24px;
+            margin-top: 8px;
+        }
+
+        .login-logo p {
+            color: #8da3bb;
+            margin-top: 6px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #aebed1;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 8px;
+            border: 1px solid #284966;
+            background: #081522;
+            color: white;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #2196f3;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #087cf0;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background: #096bd0;
+        }
+
+        #loginError {
+            color: #ff5c69;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .demo-login {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 12px;
+            color: #71869d;
+        }
+
+        /* ================= APP ================= */
+
+        #app {
+            display: none;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 245px;
+            background: #081523;
+            border-right: 1px solid #1b344e;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            padding: 22px 18px;
+            border-bottom: 1px solid #1b344e;
+        }
+
+        .brand h2 {
+            color: #4baaff;
+            font-size: 18px;
+        }
+
+        .brand p {
+            color: #7289a1;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            padding: 20px 18px 8px;
+            color: #657d95;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            padding: 13px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            color: #b7c6d7;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #0c2845;
+            color: #ffffff;
+            border-left-color: #1687ff;
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #e53935;
+            color: white;
+            padding: 3px 7px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        .logout {
+            color: #ff5964;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+        }
+
+        .topbar {
+            height: 72px;
+            padding: 0 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1b344e;
+            background: #071320;
+        }
+
+        .page-title h1 {
+            font-size: 22px;
+        }
+
+        .page-title p {
+            color: #7189a3;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .system-status {
+            padding: 8px 13px;
+            border: 1px solid #22543a;
+            border-radius: 8px;
+            color: #4ade80;
+            font-size: 13px;
+        }
+
+        .user {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #087cf0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user small {
+            display: block;
+            color: #70879d;
+        }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 25px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        /* ================= CARDS ================= */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            padding: 18px;
+            min-height: 125px;
+            background: #0b1a2b;
+            border: 1px solid #1d3954;
+            border-radius: 12px;
+        }
+
+        .stat-card h4 {
+            color: #8ea5bc;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .stat-card .number {
+            font-size: 27px;
+            font-weight: bold;
+            margin: 12px 0 6px;
+        }
+
+        .stat-card p {
+            font-size: 11px;
+            color: #6e859c;
+        }
+
+        .blue {
+            color: #42a5ff;
+        }
+
+        .purple {
+            color: #b66cff;
+        }
+
+        .red {
+            color: #ff5964;
+        }
+
+        .orange {
+            color: #ffad42;
+        }
+
+        .green {
+            color: #4ade80;
+        }
+
+        .cyan {
+            color: #32d7e8;
+        }
+
+        /* ================= GRID ================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .panel {
+            background: #0b1a2b;
+            border: 1px solid #1d3954;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid #1b344e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-size: 14px;
+        }
+
+        .panel-body {
+            padding: 15px;
+        }
+
+        /* ================= TABLE ================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #718aa4;
+            font-size: 11px;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #1b344e;
+        }
+
+        td {
+            padding: 10px;
+            font-size: 11px;
+            border-bottom: 1px solid #112a42;
+        }
+
+        .status {
+            padding: 4px 7px;
+            border-radius: 5px;
+            font-size: 10px;
+        }
+
+        .status.high {
+            background: #4a1820;
+            color: #ff6570;
+        }
+
+        .status.medium {
+            background: #493317;
+            color: #ffb74d;
+        }
+
+        .status.low {
+            background: #123b27;
+            color: #50df82;
+        }
+
+        .status.anomaly {
+            background: #431b29;
+            color: #ff5c8a;
+        }
+
+        /* ================= ML ================= */
+
+        .ml-box {
+            padding: 15px;
+            background: #081725;
+            border: 1px solid #1c3b55;
+            border-radius: 10px;
+        }
+
+        .ml-model {
+            font-size: 18px;
+            color: #4ade80;
+            margin: 8px 0 18px;
+        }
+
+        .feature {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #152d43;
+            font-size: 12px;
+        }
+
+        .check {
+            color: #4ade80;
+        }
+
+        /* ================= CHARTS ================= */
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.3fr;
+            gap: 15px;
+        }
+
+        .chart {
+            height: 250px;
+            padding: 15px;
+        }
+
+        .bar-chart {
+            height: 190px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .bar {
+            flex: 1;
+            background: #1687ff;
+            border-radius: 4px 4px 0 0;
+            min-height: 20px;
+        }
+
+        .donut {
+            width: 145px;
+            height: 145px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #4ade80 0 28%,
+                #ffb02e 28% 55%,
+                #ff7043 55% 85%,
+                #ef4444 85% 100%
+            );
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #0b1a2b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .donut-inner strong {
+            font-size: 20px;
+        }
+
+        .legend {
+            font-size: 11px;
+            line-height: 25px;
+        }
+
+        /* ================= ALERTS ================= */
+
+        .alert-item {
+            padding: 12px;
+            border-bottom: 1px solid #142c43;
+        }
+
+        .alert-title {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .alert-description {
+            color: #70869d;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        /* ================= LIVE FEED ================= */
+
+        .live-feed {
+            margin-top: 15px;
+        }
+
+        .feed {
+            padding: 14px;
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            white-space: nowrap;
+            color: #9eb2c6;
+            font-size: 11px;
+        }
+
+        .live-dot {
+            color: #4ade80;
+        }
+
+        /* ================= INNER PAGES ================= */
+
+        .page-panel {
+            background: #0b1a2b;
+            border: 1px solid #1d3954;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .page-panel h2 {
+            margin-bottom: 20px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            padding: 10px;
+            background: #081725;
+            color: white;
+            border: 1px solid #254560;
+            border-radius: 6px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .dashboard-grid,
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 800px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .brand h2,
+            .brand p,
+            .menu-title,
+            .nav-item span {
+                display: none;
+            }
+
+            .main {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOGIN PAGE
+====================================================== -->
+
+<div id="loginPage">
+
+    <div class="login-box">
+
+        <div class="login-logo">
+            <div class="shield">🛡️</div>
+            <h1>AI DECEPTION SYSTEM</h1>
+            <p>SOC Security Dashboard</p>
+        </div>
+
+        <div class="input-group">
+            <label>Username</label>
+            <input
+                type="text"
+                id="username"
+                placeholder="Enter username"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+            >
+        </div>
+
+        <button class="login-btn" onclick="login()">
+            LOGIN
+        </button>
+
+        <div id="loginError">
+            Invalid username or password
+        </div>
+
+        <div class="demo-login">
+            Demo Login: admin / admin123
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APPLICATION
+====================================================== -->
+
+<div id="app">
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <h2>🛡 AI DECEPTION</h2>
+                <p>SOC SECURITY PLATFORM</p>
+            </div>
+
+            <div class="menu-title">Main</div>
+
+            <div
+                class="nav-item active"
+                onclick="showPage('dashboard', this)"
+            >
+                <div class="nav-icon">🏠</div>
+                <span>Dashboard</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('honeypot', this)"
+            >
+                <div class="nav-icon">🍯</div>
+                <span>Honeypot</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('logs', this)"
+            >
+                <div class="nav-icon">📜</div>
+                <span>Logs</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('canary', this)"
+            >
+                <div class="nav-icon">🎯</div>
+                <span>Canary Tokens</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('ml', this)"
+            >
+                <div class="nav-icon">🤖</div>
+                <span>AI / ML Engine</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('anomalies', this)"
+            >
+                <div class="nav-icon">🔍</div>
+                <span>Anomalies</span>
+                <span class="badge">121</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('alerts', this)"
+            >
+                <div class="nav-icon">🚨</div>
+                <span>Alerts</span>
+                <span class="badge">16</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('analytics', this)"
+            >
+                <div class="nav-icon">📊</div>
+                <span>Analytics</span>
+            </div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('reports', this)"
+            >
+                <div class="nav-icon">📄</div>
+                <span>Reports</span>
+            </div>
+
+            <div class="menu-title">System</div>
+
+            <div
+                class="nav-item"
+                onclick="showPage('settings', this)"
+            >
+                <div class="nav-icon">⚙️</div>
+                <span>Settings</span>
+            </div>
+
+            <div
+                class="nav-item logout"
+                onclick="logout()"
+            >
+                <div class="nav-icon">🚪</div>
+                <span>Logout</span>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+
+        <main class="main">
+
+            <!-- TOP BAR -->
+
+            <header class="topbar">
+
+                <div class="page-title">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p>AI-powered deception network monitoring</p>
+                </div>
+
+                <div class="top-actions">
+
+                    <div class="system-status">
+                        ● System Status: ONLINE
+                    </div>
+
+                    <div>
+                        🔔
+                    </div>
+
+                    <div class="user">
+
+                        <div class="avatar">
+                            👤
+                        </div>
+
+                        <div>
+                            <strong>admin</strong>
+                            <small>Security Analyst</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- CONTENT -->
+
+            <section class="content">
+
+
+                <!-- =================================================
+                     DASHBOARD PAGE
+                ================================================== -->
+
+                <div
+                    id="dashboard"
+                    class="page active-page"
+                >
+
+                    <!-- STATS -->
+
+                    <div class="stats-grid">
+
+                        <div class="stat-card">
+                            <h4>Total Logs Analyzed</h4>
+                            <div
+                                class="number blue"
+                                id="totalLogs"
+                            >
+                                1501
+                            </div>
+                            <p>Fleet telemetry ingested</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>ML Anomalies</h4>
+                            <div
+                                class="number purple"
+                                id="mlAnomalies"
+                            >
+                                121
+                            </div>
+                            <p>High-confidence detections</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>High / Critical Threats</h4>
+                            <div
+                                class="number red"
+                                id="criticalThreats"
+                            >
+                                71
+                            </div>
+                            <p>Priority alerts</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>Canary Triggers</h4>
+                            <div
+                                class="number orange"
+                                id="canaryTriggers"
+                            >
+                                16
+                            </div>
+                            <p>Decoys engaged</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>Average Threat Score</h4>
+                            <div class="number green">
+                                63/100
+                            </div>
+                            <p>AI threat confidence</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>Attacker IPs</h4>
+                            <div class="number cyan">
+                                24
+                            </div>
+                            <p>Unique sources</p>
+                        </div>
+
+                    </div>
+
+
+                    <!-- MAIN PANELS -->
+
+                    <div class="dashboard-grid">
+
+                        <!-- HONEYPOT -->
+
+                        <div class="panel">
+
+                            <div class="panel-header">
+                                <h3>
+                                    🟢 Honeypot Activity
+                                </h3>
+
+                                <span class="status low">
+                                    LIVE
+                                </span>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <table>
+
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Source IP</th>
+                                            <th>Event</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr>
+                                            <td>14:25:31</td>
+                                            <td>192.168.1.105</td>
+                                            <td>Login Attempt</td>
+                                            <td>
+                                                <span class="status high">
+                                                    Failed
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>14:25:42</td>
+                                            <td>10.0.0.23</td>
+                                            <td>Command</td>
+                                            <td>
+                                                <span class="status medium">
+                                                    Suspicious
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>14:26:11</td>
+                                            <td>172.16.5.10</td>
+                                            <td>Login Attempt</td>
+                                            <td>
+                                                <span class="status high">
+                                                    Failed
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>14:26:32</td>
+                                            <td>203.0.113.50</td>
+                                            <td>Command</td>
+                                            <td>
+                                                <span class="status anomaly">
+                                                    Anomaly
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CANARY -->
+
+                        <div class="panel">
+
+                            <div class="panel-header">
+                                <h3>
+                                    🟢 Canary Token Alerts
+                                </h3>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <table>
+
+                                    <thead>
+                                        <tr>
+                                            <th>Token</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr>
+                                            <td>token_01</td>
+                                            <td>Credential</td>
+                                            <td>
+                                                <span class="status high">
+                                                    Triggered
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>token_02</td>
+                                            <td>File</td>
+                                            <td>
+                                                <span class="status high">
+                                                    Triggered
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>token_03</td>
+                                            <td>Database</td>
+                                            <td>
+                                                <span class="status medium">
+                                                    Triggered
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ML -->
+
+                        <div class="panel">
+
+                            <div class="panel-header">
+                                <h3>🤖 AI Engine Status</h3>
+                                <span class="status low">
+                                    RUNNING
+                                </span>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <div class="ml-box">
+
+                                    <small>Machine Learning Model</small>
+
+                                    <div class="ml-model">
+                                        Isolation Forest
+                                    </div>
+
+                                    <div class="feature">
+                                        <span>Command Count</span>
+                                        <span class="check">✓</span>
+                                    </div>
+
+                                    <div class="feature">
+                                        <span>Session Duration</span>
+                                        <span class="check">✓</span>
+                                    </div>
+
+                                    <div class="feature">
+                                        <span>Failed Logins</span>
+                                        <span class="check">✓</span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CHART AREA -->
+
+                    <div class="chart-grid">
+
+                        <div class="panel">
+
+                            <div class="panel-header">
+                                <h3>
+                                    Anomalies Over Time
+                                </h3>
+
+                                <span>Today</span>
+                            </div>
+
+                            <div class="bar-chart">
+
+                                <div
+                                    class="bar"
+                                    style="height:35%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:55%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:40%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:70%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:50%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:80%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:95%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:60%"
+                                ></div>
+
+                                <div
+                                    class="bar"
+                                    style="height:45%"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel">
+
+                            <div class="panel-header">
+                                <h3>
+                                    Threat Distribution
+                                </h3>
+                            </div>
+
+                            <div class="donut">
+
+                                <div class="donut-inner">
+                                    <strong>1501</strong>
+                                    <small>Total</small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel">
+
+                            <div class="panel-header">
+                                <h3>
+                                    Recent Alerts
+                                </h3>
+                            </div>
+
+                            <div>
+
+                                <div class="alert-item">
+                                    <div class="alert-title red">
+                                        🔴 ML Anomaly Detected
+                                    </div>
+
+                                    <div class="alert-description">
+                                        Suspicious session detected
+                                    </div>
+                                </div>
+
+                                <div class="alert-item">
+                                    <div class="alert-title orange">
+                                        🟠 Multiple Failed Logins
+                                    </div>
+
+                                    <div class="alert-description">
+                                        Authentication anomaly
+                                    </div>
+                                </div>
+
+                                <div class="alert-item">
+                                    <div class="alert-title red">
+                                        🔴 Canary Triggered
+                                    </div>
+
+                                    <div class="alert-description">
+                                        Decoy resource accessed
+                                    </div>
+                                </div>
+
+                                <div class="alert-item">
+                                    <div class="alert-title green">
+                                        🟢 System Healthy
+                                    </div>
+
+                                    <div class="alert-description">
+                                        All services running
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LIVE FEED -->
+
+                    <div class="panel live-feed">
+
+                        <div class="panel-header">
+                            <h3>
+                                <span class="live-dot">●</span>
+                                Live Activity Feed
+                            </h3>
+                        </div>
+
+                        <div
+                            class="feed"
+                            id="liveFeed"
+                        >
+
+                            <span>
+                                14:27:15 New SSH session detected
+                            </span>
+
+                            <span>
+                                14:27:18 Command activity captured
+                            </span>
+
+                            <span>
+                                14:27:22 ML anomaly detected
+                            </span>
+
+                            <span>
+                                14:27:23 Threat score updated
+                            </span>
+
+                            <span>
+                                14:27:24 Alert generated
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     HONEYPOT PAGE
+                ================================================== -->
+
+                <div
+                    id="honeypot"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>🍯 Honeypot Monitoring</h2>
+
+                        <div class="stats-grid">
+
+                            <div class="stat-card">
+                                <h4>Cowrie Status</h4>
+                                <div class="number green">
+                                    ONLINE
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>SSH Port</h4>
+                                <div class="number blue">
+                                    2222
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>Active Sessions</h4>
+                                <div class="number purple">
+                                    12
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>Failed Logins</h4>
+                                <div class="number red">
+                                    45
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h3>Recent Honeypot Events</h3>
+
+                        <br>
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Session</th>
+                                    <th>Source IP</th>
+                                    <th>Event</th>
+                                    <th>Command Count</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>14:27:15</td>
+                                    <td>S001</td>
+                                    <td>203.0.113.50</td>
+                                    <td>SSH Login</td>
+                                    <td>12</td>
+                                    <td>
+                                        <span class="status anomaly">
+                                            ANOMALY
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>14:25:31</td>
+                                    <td>S002</td>
+                                    <td>192.168.1.105</td>
+                                    <td>Failed Login</td>
+                                    <td>3</td>
+                                    <td>
+                                        <span class="status high">
+                                            HIGH
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     LOGS PAGE
+                ================================================== -->
+
+                <div
+                    id="logs"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>📜 Honeypot Logs</h2>
+
+                        <div class="toolbar">
+
+                            <input
+                                type="text"
+                                id="logSearch"
+                                placeholder="Search IP / event..."
+                                onkeyup="searchLogs()"
+                            >
+
+                            <select>
+                                <option>All Events</option>
+                                <option>Login</option>
+                                <option>Command</option>
+                                <option>Session</option>
+                            </select>
+
+                        </div>
+
+                        <table id="logsTable">
+
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Source IP</th>
+                                    <th>Username</th>
+                                    <th>Event</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>14:27:15</td>
+                                    <td>203.0.113.50</td>
+                                    <td>root</td>
+                                    <td>Command Execution</td>
+                                    <td>
+                                        <span class="status anomaly">
+                                            ANOMALY
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>14:26:11</td>
+                                    <td>172.16.5.10</td>
+                                    <td>admin</td>
+                                    <td>Login Attempt</td>
+                                    <td>
+                                        <span class="status high">
+                                            FAILED
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CANARY PAGE
+                ================================================== -->
+
+                <div
+                    id="canary"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>🎯 Canary Token Monitoring</h2>
+
+                        <div class="stats-grid">
+
+                            <div class="stat-card">
+                                <h4>Total Tokens</h4>
+                                <div class="number blue">20</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>Active Tokens</h4>
+                                <div class="number green">16</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>Triggered</h4>
+                                <div class="number red">4</div>
+                            </div>
+
+                        </div>
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Token ID</th>
+                                    <th>Type</th>
+                                    <th>Triggered By</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>token_01</td>
+                                    <td>Credential</td>
+                                    <td>203.0.113.50</td>
+                                    <td>14:26:41</td>
+                                    <td>
+                                        <span class="status high">
+                                            TRIGGERED
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>token_02</td>
+                                    <td>File</td>
+                                    <td>198.51.100.8</td>
+                                    <td>14:25:16</td>
+                                    <td>
+                                        <span class="status high">
+                                            TRIGGERED
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ML PAGE
+                ================================================== -->
+
+                <div
+                    id="ml"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>🤖 AI / ML Engine</h2>
+
+                        <div class="ml-box">
+
+                            <h3>Isolation Forest</h3>
+
+                            <p style="margin-top:10px;color:#7d94ab;">
+                                Unsupervised anomaly detection engine
+                            </p>
+
+                            <br>
+
+                            <div class="feature">
+                                <span>Model Status</span>
+                                <span class="green">
+                                    RUNNING
+                                </span>
+                            </div>
+
+                            <div class="feature">
+                                <span>Command Count</span>
+                                <span class="check">✓</span>
+                            </div>
+
+                            <div class="feature">
+                                <span>Session Duration</span>
+                                <span class="check">✓</span>
+                            </div>
+
+                            <div class="feature">
+                                <span>Failed Login Attempts</span>
+                                <span class="check">✓</span>
+                            </div>
+
+                            <div class="feature">
+                                <span>Anomalies Detected</span>
+                                <strong>121</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ANOMALIES
+                ================================================== -->
+
+                <div
+                    id="anomalies"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>🔍 ML Anomalies</h2>
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Session</th>
+                                    <th>Command Count</th>
+                                    <th>Duration</th>
+                                    <th>Failed Logins</th>
+                                    <th>ML Result</th>
+                                    <th>Threat Score</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>S001</td>
+                                    <td>12</td>
+                                    <td>35 sec</td>
+                                    <td>1</td>
+                                    <td>
+                                        <span class="status low">
+                                            NORMAL
+                                        </span>
+                                    </td>
+                                    <td>18</td>
+                                </tr>
+
+                                <tr>
+                                    <td>S002</td>
+                                    <td>85</td>
+                                    <td>420 sec</td>
+                                    <td>9</td>
+                                    <td>
+                                        <span class="status anomaly">
+                                            ANOMALY
+                                        </span>
+                                    </td>
+                                    <td>82</td>
+                                </tr>
+
+                                <tr>
+                                    <td>S003</td>
+                                    <td>120</td>
+                                    <td>650 sec</td>
+                                    <td>15</td>
+                                    <td>
+                                        <span class="status high">
+                                            ANOMALY
+                                        </span>
+                                    </td>
+                                    <td>94</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ALERTS
+                ================================================== -->
+
+                <div
+                    id="alerts"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>🚨 Security Alerts</h2>
+
+                        <div class="alert-item">
+                            <div class="alert-title red">
+                                HIGH — ML Anomaly Detected
+                            </div>
+                            <div class="alert-description">
+                                Suspicious honeypot session detected.
+                                Threat Score: 87
+                            </div>
+                        </div>
+
+                        <div class="alert-item">
+                            <div class="alert-title orange">
+                                MEDIUM — Failed Login Attempts
+                            </div>
+                            <div class="alert-description">
+                                Multiple failed authentication attempts.
+                            </div>
+                        </div>
+
+                        <div class="alert-item">
+                            <div class="alert-title red">
+                                HIGH — Canary Token Triggered
+                            </div>
+                            <div class="alert-description">
+                                Decoy resource was accessed.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ANALYTICS
+                ================================================== -->
+
+                <div
+                    id="analytics"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>📊 Security Analytics</h2>
+
+                        <div class="stats-grid">
+
+                            <div class="stat-card">
+                                <h4>Normal Sessions</h4>
+                                <div class="number green">
+                                    1380
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>Anomalies</h4>
+                                <div class="number red">
+                                    121
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <h4>Average Score</h4>
+                                <div class="number orange">
+                                    63
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h3>Threat Score Distribution</h3>
+
+                        <br>
+
+                        <div class="donut">
+                            <div class="donut-inner">
+                                <strong>63</strong>
+                                <small>Score</small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     REPORTS
+                ================================================== -->
+
+                <div
+                    id="reports"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>📄 Security Reports</h2>
+
+                        <p style="color:#8095aa;margin-bottom:20px;">
+                            Generate security monitoring reports.
+                        </p>
+
+                        <button
+                            class="login-btn"
+                            style="width:auto;padding:10px 20px;"
+                            onclick="generateReport()"
+                        >
+                            Generate Report
+                        </button>
+
+                        <div
+                            id="reportOutput"
+                            style="margin-top:20px;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     SETTINGS
+                ================================================== -->
+
+                <div
+                    id="settings"
+                    class="page"
+                >
+
+                    <div class="page-panel">
+
+                        <h2>⚙ System Settings</h2>
+
+                        <div class="feature">
+                            <span>Backend API</span>
+                            <span class="green">
+                                ONLINE
+                            </span>
+                        </div>
+
+                        <div class="feature">
+                            <span>Cowrie Honeypot</span>
+                            <span class="green">
+                                ONLINE
+                            </span>
+                        </div>
+
+                        <div class="feature">
+                            <span>ML Engine</span>
+                            <span class="green">
+                                READY
+                            </span>
+                        </div>
+
+                        <div class="feature">
+                            <span>Canary Integration</span>
+                            <span class="orange">
+                                DEMO MODE
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =====================================================
+       LOGIN
+    ====================================================== */
+
+    function login() {
+
+        const username =
+            document.getElementById("username").value;
+
+        const password =
+            document.getElementById("password").value;
+
+        const error =
+            document.getElementById("loginError");
+
+        /*
+         * DEMO LOGIN
+         *
+         * Later replace this with:
+         *
+         * fetch("/api/auth/login", {...})
+         *
+         */
+
+        if (
+            username === "admin" &&
+            password === "admin123"
+        ) {
+
+            localStorage.setItem(
+                "loggedIn",
+                "true"
+            );
+
+            document.getElementById(
+                "loginPage"
+            ).style.display = "none";
+
+            document.getElementById(
+                "app"
+            ).style.display = "block";
+
+        } else {
+
+            error.style.display = "block";
+
+        }
+
+    }
+
+
+    /* =====================================================
+       LOGOUT
+    ====================================================== */
+
+    function logout() {
+
+        localStorage.removeItem("loggedIn");
+
+        document.getElementById(
+            "app"
+        ).style.display = "none";
+
+        document.getElementById(
+            "loginPage"
+        ).style.display = "flex";
+
+        document.getElementById(
+            "username"
+        ).value = "";
+
+        document.getElementById(
+            "password"
+        ).value = "";
+
+    }
+
+
+    /* =====================================================
+       PAGE NAVIGATION
+    ====================================================== */
+
+    function showPage(pageId, element) {
+
+        const pages =
+            document.querySelectorAll(".page");
+
+        pages.forEach(page => {
+
+            page.classList.remove(
+                "active-page"
+            );
+
+        });
+
+        const selected =
+            document.getElementById(pageId);
+
+        if (selected) {
+
+            selected.classList.add(
+                "active-page"
+            );
+
+        }
+
+        const navItems =
+            document.querySelectorAll(".nav-item");
+
+        navItems.forEach(item => {
+
+            item.classList.remove("active");
+
+        });
+
+        if (element) {
+
+            element.classList.add("active");
+
+        }
+
+        const titles = {
+
+            dashboard: "Dashboard",
+
+            honeypot: "Honeypot Monitoring",
+
+            logs: "Honeypot Logs",
+
+            canary: "Canary Token Monitoring",
+
+            ml: "AI / ML Engine",
+
+            anomalies: "ML Anomalies",
+
+            alerts: "Security Alerts",
+
+            analytics: "Security Analytics",
+
+            reports: "Security Reports",
+
+            settings: "System Settings"
+
+        };
+
+        document.getElementById(
+            "pageTitle"
+        ).innerText =
+            titles[pageId] || "Dashboard";
+
+    }
+
+
+    /* =====================================================
+       LOG SEARCH
+    ====================================================== */
+
+    function searchLogs() {
+
+        const search =
+            document.getElementById(
+                "logSearch"
+            ).value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                "#logsTable tbody tr"
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            if (text.includes(search)) {
+
+                row.style.display = "";
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       REPORT
+    ====================================================== */
+
+    function generateReport() {
+
+        const output =
+            document.getElementById(
+                "reportOutput"
+            );
+
+        const date =
+            new Date().toLocaleString();
+
+        output.innerHTML = `
+
+            <div class="ml-box">
+
+                <h3>AI Deception Security Report</h3>
+
+                <br>
+
+                <p>
+                    Generated:
+                    ${date}
+                </p>
+
+                <br>
+
+                <p>
+                    Total Logs:
+                    <strong>1501</strong>
+                </p>
+
+                <p>
+                    ML Anomalies:
+                    <strong>121</strong>
+                </p>
+
+                <p>
+                    High/Critical Threats:
+                    <strong>71</strong>
+                </p>
+
+                <p>
+                    Canary Triggers:
+                    <strong>16</strong>
+                </p>
+
+                <p>
+                    Average Threat Score:
+                    <strong>63/100</strong>
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =====================================================
+       LIVE FEED SIMULATION
+    ====================================================== */
+
+    const activities = [
+
+        "New SSH session detected",
+
+        "Failed login attempt captured",
+
+        "Command activity recorded",
+
+        "ML anomaly detected",
+
+        "Threat score updated",
+
+        "Canary Token event received",
+
+        "Security alert generated",
+
+        "Honeypot session closed"
+
+    ];
+
+    function updateLiveFeed() {
+
+        const feed =
+            document.getElementById(
+                "liveFeed"
+            );
+
+        const now =
+            new Date().toLocaleTimeString();
+
+        const activity =
+            activities[
+                Math.floor(
+                    Math.random() *
+                    activities.length
+                )
+            ];
+
+        const span =
+            document.createElement("span");
+
+        span.innerText =
+            now + " " + activity;
+
+        feed.appendChild(span);
+
+        /*
+         * Keep only latest 8 events
+         */
+
+        while (
+            feed.children.length > 8
+        ) {
+
+            feed.removeChild(
+                feed.firstChild
+            );
+
+        }
+
+    }
+
+    setInterval(
+        updateLiveFeed,
+        5000
+    );
+
+
+    /* =====================================================
+       SESSION CHECK
+    ====================================================== */
+
+    window.onload = function() {
+
+        if (
+            localStorage.getItem(
+                "loggedIn"
+            ) === "true"
+        ) {
+
+            document.getElementById(
+                "loginPage"
+            ).style.display = "none";
+
+            document.getElementById(
+                "app"
+            ).style.display = "block";
+
+        }
+
+    };
+
+</script>
+
+</body>
+</html>ssName="text-slate-400 text-sm uppercase">ML Anomalies Flagged</h3>
+                    <div className="text-4xl font-bold text-amber-400 mt-2">800</div>
+                </div>
+            </div>
+        </div>
+    );
+};
